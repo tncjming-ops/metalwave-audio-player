@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1a202c">
+<title>METALWAVE｜本機音訊播放器</title>
+<style>
+:root{color-scheme:dark;--bg:#1a202c;--panel:#2d3748;--metal:#4a5568;--bright:#718096;--text:#e2e8f0;--muted:#a0aec0;--accent:#fed7aa;--orange:#f59e0b;--green:#22c55e;--red:#ef4444;--shadow:rgba(5,10,20,.72)}
+*{box-sizing:border-box}html{min-width:320px;background:var(--bg)}body{margin:0;min-height:100vh;padding:26px 22px;background:radial-gradient(ellipse at 50% -20%,#4a5568 0%,transparent 48%),linear-gradient(145deg,#1a202c,#2d3748 65%,#171d27);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;justify-content:center;align-items:center}
+button,input{font:inherit}button{color:inherit}.app-shell{width:min(1152px,100%);min-height:min(680px,80vh);height:min(680px,80vh);border:1px solid rgba(226,232,240,.18);border-radius:16px;overflow:hidden;background:linear-gradient(135deg,rgba(113,128,150,.26),transparent 24%),linear-gradient(155deg,#4a5568 0%,#394455 42%,#2d3748 100%);box-shadow:0 28px 70px rgba(0,0,0,.52),inset 0 1px 1px rgba(255,255,255,.28),inset 0 -2px 5px rgba(0,0,0,.42);display:flex;flex-direction:column;position:relative}
+.app-header{height:76px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 26px;border-bottom:1px solid rgba(226,232,240,.12);background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.015));box-shadow:0 5px 18px rgba(0,0,0,.15)}.brand{display:flex;align-items:center;gap:13px}.brand-mark{width:37px;height:37px;border-radius:11px;background:linear-gradient(145deg,#fed7aa,#f59e0b 55%,#b45309);display:grid;place-items:center;color:#302315;font-size:20px;box-shadow:0 5px 12px #111827,inset 0 1px 2px #fff9;font-weight:900}.brand h1{font-size:15px;letter-spacing:.2em;margin:0;color:#fff}.brand p{font-size:10px;color:var(--muted);letter-spacing:.16em;margin:4px 0 0}.header-badge{display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.08em;color:#cbd5e1;padding:8px 12px;border-radius:999px;background:linear-gradient(180deg,#465266,#313b4c);box-shadow:inset 0 1px 2px #ffffff22,0 3px 6px #101722}.live-dot{width:7px;height:7px;border-radius:50%;background:#38bdf8;box-shadow:0 0 9px #38bdf8}
+.main-grid{display:grid;grid-template-columns:40% 60%;flex:1;min-height:0}.left-panel,.right-panel{min-width:0;min-height:0;padding:22px 24px}.left-panel{border-right:1px solid rgba(15,23,42,.35);box-shadow:inset -1px 0 rgba(255,255,255,.07);display:flex;flex-direction:column;gap:15px}.right-panel{display:flex;flex-direction:column;gap:14px}.section-kicker{font-size:10px;letter-spacing:.19em;color:var(--accent);font-weight:800;text-transform:uppercase}.now-playing{display:flex;align-items:center;gap:14px;min-width:0}.album-art{width:66px;height:66px;flex:none;border-radius:13px;background:radial-gradient(circle at 30% 25%,#64748b 0%,#475569 27%,#253041 70%);box-shadow:inset 3px 3px 9px #ffffff22,inset -5px -6px 12px #111827aa,0 6px 14px #101722;display:grid;place-items:center;position:relative;overflow:hidden}.album-art:before{content:"";position:absolute;width:42px;height:42px;border-radius:50%;border:1px solid #ffffff2c;box-shadow:0 0 0 5px #ffffff0c,0 0 0 10px #ffffff09}.album-art:after{content:"";position:absolute;width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--orange)}.album-glyph{z-index:1;font-size:18px;color:#e2e8f0b0;transform:translateY(-1px)}.track-meta{min-width:0}.track-meta .section-kicker{margin-bottom:7px}.track-title{font-size:16px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0 0 4px}.track-subtitle{font-size:11px;color:var(--muted);margin:0}.transport{display:flex;align-items:center;justify-content:center;gap:14px;padding:3px 0}.control-btn{border:1px solid #ffffff22;border-radius:50%;display:grid;place-items:center;cursor:pointer;background:linear-gradient(145deg,#8491a4 0%,#647187 45%,#414c5e 100%);box-shadow:5px 6px 11px #1b2431,inset 1px 1px 2px #ffffff66,inset -2px -3px 5px #202938;color:#e2e8f0;transition:transform .12s,box-shadow .12s,filter .12s}.control-btn:hover{filter:brightness(1.12)}.control-btn:active{transform:scale(.95);box-shadow:inset 3px 4px 8px #1b2431,inset -1px -1px 2px #ffffff33}.control-btn:focus-visible,button:focus-visible,input:focus-visible,.volume-knob:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.control-btn.small{width:52px;height:52px}.control-btn.play{width:72px;height:72px;background:linear-gradient(145deg,#a5b0c0,#65738a 55%,#404b5c)}.control-btn svg{width:19px;height:19px;fill:currentColor}.control-btn.play svg{width:26px;height:26px}.play-icon{color:var(--green);filter:drop-shadow(0 0 4px #22c55e55)}.stop-icon{color:var(--red);filter:drop-shadow(0 0 4px #ef444455)}
+.progress-block{padding:0 1px}.progress-times{display:flex;justify-content:space-between;font-variant-numeric:tabular-nums;font-size:10px;color:var(--muted);margin-bottom:8px}.range-wrap{position:relative;height:8px;border-radius:99px;background:linear-gradient(180deg,#171e29,#313b4a);box-shadow:inset 0 2px 4px #05090e,inset 0 -1px 1px #ffffff1a}.progress-fill{height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#f97316,#fbbf24,#fde68a);box-shadow:0 0 9px #f59e0b77;pointer-events:none}.progress-range{position:absolute;inset:-6px 0;width:100%;height:20px;margin:0;opacity:0;cursor:pointer}.progress-range::-webkit-slider-thumb{appearance:none;width:20px;height:20px}.progress-range::-moz-range-thumb{width:20px;height:20px;border:0}
+.volume-row{display:flex;align-items:center;justify-content:center;gap:18px;padding:0 0 2px}.volume-label{display:flex;flex-direction:column;gap:4px}.volume-label strong{font-size:11px;letter-spacing:.1em}.volume-label span{font-size:10px;color:var(--muted)}.volume-value{color:var(--accent);font-variant-numeric:tabular-nums}.volume-knob{width:60px;height:60px;border-radius:50%;position:relative;cursor:ew-resize;touch-action:none;background:radial-gradient(circle at 34% 25%,#d9e0e9 0%,#8794a6 21%,#5a6678 48%,#344052 72%,#202a39 100%);border:1px solid #ffffff35;box-shadow:inset 3px 3px 7px #ffffff55,inset -5px -7px 11px #111927aa,0 7px 13px #1b2431;user-select:none}.volume-knob:before{content:"";position:absolute;inset:8px;border-radius:50%;border:1px solid #ffffff25;box-shadow:inset 0 1px 2px #fff2}.knob-indicator{position:absolute;width:5px;height:11px;border-radius:4px;left:50%;top:7px;transform-origin:50% 23px;transform:translateX(-50%) rotate(0deg);background:var(--accent);box-shadow:0 0 8px #f59e0b,0 0 2px #fff}
+.eq-card{margin-top:auto;padding:12px 13px 11px;border-radius:12px;background:linear-gradient(145deg,#303b4c,#202a38);box-shadow:inset 2px 2px 7px #111824,inset -1px -1px 2px #ffffff12,0 1px 0 #ffffff12}.eq-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}.eq-title{font-size:11px;font-weight:800;letter-spacing:.12em}.eq-state{font-size:9px;color:var(--muted);letter-spacing:.08em}.preset-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}.preset-btn{padding:6px 3px;border:1px solid #ffffff1d;border-radius:7px;background:linear-gradient(145deg,#69778b,#465267);font-size:10px;color:#e2e8f0;cursor:pointer;box-shadow:2px 3px 5px #111824,inset 0 1px 1px #ffffff40;transition:.12s}.preset-btn:hover{filter:brightness(1.12)}.preset-btn.active{color:var(--accent);background:linear-gradient(145deg,#374354,#293342);box-shadow:inset 2px 2px 5px #111824,inset -1px -1px 2px #ffffff1a}.eq-bands{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px;align-items:end}.eq-band{min-width:0;display:flex;align-items:center;flex-direction:column;gap:5px}.eq-val{font-size:8px;height:10px;color:#cbd5e1;font-variant-numeric:tabular-nums}.eq-range{appearance:none;-webkit-appearance:none;writing-mode:vertical-lr;direction:rtl;width:8px;height:72px;margin:0;cursor:pointer;border-radius:99px;background:linear-gradient(to bottom,#ef4444 0%,#f97316 48%,#facc15 100%);box-shadow:inset 1px 1px 3px #111827aa,0 0 5px #f59e0b22}.eq-range::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;border:1px solid #ffffff55;background:radial-gradient(circle at 32% 25%,#f1f5f9,#8794a6 40%,#364152 100%);box-shadow:2px 3px 5px #111827,inset 1px 1px 2px #fff9}.eq-range::-moz-range-thumb{width:18px;height:18px;border-radius:50%;border:1px solid #ffffff55;background:radial-gradient(circle at 32% 25%,#f1f5f9,#8794a6 40%,#364152 100%);box-shadow:2px 3px 5px #111827}.eq-freq{font-size:8px;color:var(--muted);white-space:nowrap;writing-mode:vertical-rl;transform:rotate(180deg);height:35px;letter-spacing:.02em}.eq-note{font-size:9px;color:var(--muted);text-align:center;margin:5px 0 0}
+.visual-card{flex:none;height:172px;min-height:145px;border-radius:13px;padding:12px 14px 10px;background:radial-gradient(ellipse at 50% 110%,#334457,#1d2735 72%);box-shadow:inset 2px 2px 8px #0a101a,inset -1px -1px 2px #ffffff15,0 1px 0 #ffffff10;position:relative;overflow:hidden}.visual-top{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between}.visual-title{font-size:10px;letter-spacing:.15em;font-weight:800}.visual-caption{font-size:9px;color:var(--muted)}#visualizer{width:100%;height:calc(100% - 22px);display:block;margin-top:8px}.visual-overlay{position:absolute;inset:38px 14px 10px;pointer-events:none;background:linear-gradient(180deg,transparent 80%,#22d3ee09);border-bottom:1px solid #8ba1b522}.right-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.playlist-heading{display:flex;align-items:baseline;gap:9px}.playlist-heading h2{font-size:13px;margin:0;letter-spacing:.06em}.count-pill{font-size:10px;color:var(--accent);padding:3px 8px;border-radius:99px;background:#1f2937aa;box-shadow:inset 0 1px 3px #0007}.list-actions{display:flex;align-items:center;gap:8px}.add-btn,.clear-btn{border:1px solid #ffffff25;border-radius:8px;cursor:pointer;font-size:10px;font-weight:750;letter-spacing:.03em;transition:transform .12s,filter .12s}.add-btn{padding:8px 12px;color:#422b0c;background:linear-gradient(145deg,#fde68a,#f59e0b 62%,#d97706);box-shadow:3px 4px 8px #161e2a,inset 1px 1px 2px #fff9}.clear-btn{padding:8px 10px;color:#fecaca;background:linear-gradient(145deg,#b74b54,#7f2932);box-shadow:3px 4px 8px #161e2a,inset 1px 1px 2px #ffffff44}.add-btn:hover,.clear-btn:hover{filter:brightness(1.1)}.add-btn:active,.clear-btn:active{transform:scale(.97);box-shadow:inset 2px 2px 5px #111824}.file-input{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;clip-path:inset(50%)}.list-subhead{display:grid;grid-template-columns:34px 1fr 32px;align-items:center;padding:0 10px 7px;color:#94a3b8;font-size:9px;letter-spacing:.12em;text-transform:uppercase;border-bottom:1px solid #ffffff13}.playlist{flex:1;min-height:90px;overflow:auto;padding:7px 4px 4px;border-radius:10px;background:linear-gradient(160deg,#263141,#1d2735);box-shadow:inset 2px 2px 7px #101720,inset -1px -1px 2px #ffffff12;scrollbar-width:thin;scrollbar-color:#64748b #1e293b}.track-row{display:grid;grid-template-columns:34px minmax(0,1fr) 32px;align-items:center;gap:0;padding:7px 7px;border:1px solid transparent;border-radius:8px;color:#cbd5e1;cursor:pointer;transition:background .12s,border .12s,transform .12s;min-height:43px}.track-row+.track-row{margin-top:3px}.track-row:hover{background:#ffffff0a}.track-row.current{background:linear-gradient(90deg,#f59e0b20,#f59e0b08);border-color:#fbbf2433;color:#fff}.track-row.dragging{opacity:.42}.track-row.drag-over{border-color:#fbbf24;background:#f59e0b18}.track-number{display:flex;align-items:center;gap:5px;color:#94a3b8;font-size:10px;font-variant-numeric:tabular-nums}.drag-handle{font-size:13px;color:#708097;cursor:grab;touch-action:none;line-height:1}.track-row.current .track-number{color:var(--accent)}.track-name{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px;font-weight:600}.track-state{font-size:9px;color:#9ca3af;margin-top:3px}.track-main{min-width:0}.delete-btn{width:25px;height:25px;border:0;border-radius:7px;background:transparent;color:#f87171;font-size:18px;line-height:1;cursor:pointer;opacity:.6}.delete-btn:hover{background:#ef44442a;opacity:1}.empty-state{height:100%;min-height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--muted);gap:9px;font-size:11px}.empty-icon{font-size:25px;opacity:.65}.empty-state strong{color:#dbe3ee;font-size:12px}.empty-state span{max-width:260px;line-height:1.6}.footer-status{flex:none;min-height:20px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:9px;color:#a0aec0}.status-left{display:flex;align-items:center;gap:7px;min-width:0}.status-led{width:6px;height:6px;flex:none;border-radius:50%;background:#34d399;box-shadow:0 0 6px #34d39988}.status-led.warn{background:#fbbf24;box-shadow:0 0 6px #fbbf2488}.status-message{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.local-tag{white-space:nowrap;color:#64748b;letter-spacing:.08em}
+@media(max-width:1024px){body{align-items:flex-start;padding:18px}.app-shell{height:auto;min-height:0;overflow:visible}.main-grid{grid-template-columns:1fr}.left-panel{border-right:0;border-bottom:1px solid rgba(15,23,42,.35);box-shadow:inset 0 -1px rgba(255,255,255,.06);padding:20px 24px;gap:15px}.right-panel{min-height:380px;padding:20px 24px}.eq-card{margin-top:0}.playlist{min-height:180px;max-height:310px}.visual-card{height:190px}}
+@media(max-width:560px){body{padding:10px}.app-header{height:64px;padding:0 16px}.brand-mark{width:33px;height:33px}.brand h1{font-size:13px}.header-badge{font-size:9px;padding:7px 9px}.left-panel,.right-panel{padding:17px 15px}.now-playing{gap:11px}.album-art{width:58px;height:58px}.track-title{font-size:14px}.transport{gap:12px}.control-btn.small{width:47px;height:47px}.control-btn.play{width:66px;height:66px}.eq-card{padding:11px 8px}.eq-bands{gap:2px}.eq-freq{font-size:7px}.eq-range{height:67px}.preset-btn{font-size:9px}.right-head{align-items:flex-start;flex-wrap:wrap}.list-actions{gap:6px}.add-btn,.clear-btn{font-size:9px;padding:7px 9px}.visual-card{height:165px}.footer-status{align-items:flex-start}.local-tag{font-size:8px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="app-shell" aria-label="MetalWave 本機音訊播放器">
+  <header class="app-header">
+    <div class="brand"><div class="brand-mark" aria-hidden="true">♫</div><div><h1>METALWAVE</h1><p>LOCAL AUDIO · STUDIO PLAYER</p></div></div>
+    <div class="header-badge"><i class="live-dot" aria-hidden="true"></i>離線本機播放</div>
+  </header>
+  <div class="main-grid">
+    <section class="left-panel" aria-label="播放控制與等化器">
+      <div class="now-playing">
+        <div class="album-art" aria-hidden="true"><span class="album-glyph">♫</span></div>
+        <div class="track-meta"><div class="section-kicker">正在播放</div><p class="track-title" id="currentTitle">尚未選擇曲目</p><p class="track-subtitle" id="currentSubtitle">加入 MP3 或 WAV 開始聆聽</p></div>
+      </div>
+      <div class="transport" aria-label="播放控制">
+        <button class="control-btn small" id="prevBtn" type="button" aria-label="上一首" title="上一首"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h2v14H6zm12.7 1.1v11.8c0 .8-.9 1.2-1.5.8L9 12.8a1 1 0 0 1 0-1.6l8.2-5.9c.6-.4 1.5 0 1.5.8z"/></svg></button>
+        <button class="control-btn play" id="playBtn" type="button" aria-label="播放" title="播放"><svg id="playIcon" class="play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.6c0-.8.9-1.3 1.6-.8l10 6.4a1 1 0 0 1 0 1.6l-10 6.4c-.7.5-1.6 0-1.6-.8z"/></svg></button>
+        <button class="control-btn small" id="stopBtn" type="button" aria-label="停止" title="停止"><svg class="stop-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h12v12H6z"/></svg></button>
+        <button class="control-btn small" id="nextBtn" type="button" aria-label="下一首" title="下一首"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5h2v14h-2zM5.3 6.1v11.8c0 .8.9 1.2 1.5.8l8.2-5.9a1 1 0 0 0 0-1.6L6.8 5.3c-.6-.4-1.5 0-1.5.8z"/></svg></button>
+      </div>
+      <div class="progress-block"><div class="progress-times"><span id="elapsed">00:00</span><span id="duration">00:00</span></div><div class="range-wrap"><div class="progress-fill" id="progressFill"></div><input id="progressRange" class="progress-range" type="range" min="0" max="1000" value="0" aria-label="播放進度" title="拖曳以調整播放進度"></div></div>
+      <div class="volume-row"><div class="volume-knob" id="volumeKnob" role="slider" tabindex="0" aria-label="音量" aria-valuemin="0" aria-valuemax="100" aria-valuenow="75" title="向左拖曳增加音量，向右拖曳降低音量"><span class="knob-indicator" id="knobIndicator"></span></div><div class="volume-label"><strong>MASTER VOLUME</strong><span>左右拖曳調整 · <b id="volumeValue" class="volume-value">75%</b></span></div></div>
+      <div class="eq-card">
+        <div class="eq-head"><div class="eq-title">10-BAND EQUALIZER</div><div class="eq-state" id="eqState">WEB AUDIO EQ</div></div>
+        <div class="preset-row" id="presetRow" aria-label="等化器預設"></div>
+        <div class="eq-bands" id="eqBands"></div>
+        <p class="eq-note">增益範圍 −12 至 +12 dB</p>
+      </div>
+    </section>
+    <section class="right-panel" aria-label="音訊視覺化與播放清單">
+      <div class="visual-card"><div class="visual-top"><span class="visual-title">SPECTRUM ANALYZER</span><span class="visual-caption">128 頻譜柱 · 即時分析</span></div><canvas id="visualizer" aria-label="即時音訊頻譜視覺化"></canvas><div class="visual-overlay"></div></div>
+      <div class="right-head"><div class="playlist-heading"><h2>播放清單</h2><span class="count-pill" id="trackCount">0 首曲目</span></div><div class="list-actions"><button class="add-btn" id="addBtn" type="button">＋ 選擇檔案</button><button class="clear-btn" id="clearBtn" type="button">全部清除</button><input class="file-input" id="fileInput" type="file" accept=".mp3,.wav,audio/mpeg,audio/wav,audio/x-wav" multiple aria-label="選擇 MP3 或 WAV 音訊檔案"></div></div>
+      <div class="list-subhead"><span>序號</span><span>曲目名稱</span><span></span></div>
+      <div class="playlist" id="playlist" aria-label="可拖曳排序的播放清單" aria-live="polite"></div>
+      <div class="footer-status"><div class="status-left"><i id="statusLed" class="status-led" aria-hidden="true"></i><span id="statusMessage" class="status-message">就緒 — 選取本機音訊檔案以開始</span></div><span class="local-tag">100% LOCAL · NO CDN</span></div>
+    </section>
+  </div>
+</main>
+<audio id="audio" preload="metadata"></audio>
+<script>
+(() => {
+  "use strict";
+  const bands = [
+    { label: "60", hz: 60 }, { label: "170", hz: 170 }, { label: "310", hz: 310 },
+    { label: "600", hz: 600 }, { label: "1k", hz: 1000 }, { label: "3k", hz: 3000 },
+    { label: "6k", hz: 6000 }, { label: "10k", hz: 10000 }, { label: "12k", hz: 12000 }, { label: "16k", hz: 16000 }
+  ];
+  const presets = [
+    { name: "平衡", values: [0,0,0,0,0,0,0,0,0,0] },
+    { name: "搖滾", values: [5,4,2,-1,-2,2,4,5,5,5] },
+    { name: "流行", values: [-1,2,4,5,3,0,-1,-1,0,1] },
+    { name: "古典", values: [4,3,2,1,-1,-1,0,2,3,4] },
+    { name: "重低音", values: [8,7,5,2,0,-2,-3,-3,-2,-1] },
+    { name: "人聲", values: [-3,-2,-1,1,4,5,4,2,0,-1] }
+  ];
+  const $ = (id) => document.getElementById(id);
+  const audio = $("audio"), playlistEl = $("playlist"), fileInput = $("fileInput");
+  const trackTitle = $("currentTitle"), trackSubtitle = $("currentSubtitle");
+  const tracks = [];
+  let currentId = null, audioContext = null, sourceNode = null, analyser = null, filterNodes = [];
+  let audioSupported = typeof window.AudioContext === "function" || typeof window.webkitAudioContext === "function";
+  let objectSequence = 0, isSeeking = false, nativeDragId = null, touchDragId = null;
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  const volumeKnob = $("volumeKnob");
+  let volume = 0.75;
+
+  const announce = (message, warning = false) => {
+    $("statusMessage").textContent = message;
+    $("statusLed").classList.toggle("warn", warning);
+  };
+  const formatTime = (seconds) => {
+    if (!Number.isFinite(seconds) || seconds < 0) return "00:00";
+    const total = Math.floor(seconds);
+    return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+  };
+  const getCurrent = () => tracks.find(track => track.id === currentId) || null;
+  const updateVolumeUI = () => {
+    const percent = Math.round(volume * 100);
+    $("volumeValue").textContent = `${percent}%`;
+    volumeKnob.setAttribute("aria-valuenow", String(percent));
+    $("knobIndicator").style.transform = `translateX(-50%) rotate(${-135 + volume * 270}deg)`;
+    audio.volume = volume;
+  };
+  const setVolume = (value) => { volume = Math.max(0, Math.min(1, value)); updateVolumeUI(); };
+  const setPlayButton = (playing) => {
+    const button = $("playBtn"), icon = $("playIcon");
+    if (playing) {
+      button.setAttribute("aria-label", "暫停"); button.title = "暫停";
+      icon.innerHTML = '<path d="M6 5h4v14H6zm8 0h4v14h-4z"/>';
+    } else {
+      button.setAttribute("aria-label", "播放"); button.title = "播放";
+      icon.innerHTML = '<path d="M8 5.6c0-.8.9-1.3 1.6-.8l10 6.4a1 1 0 0 1 0 1.6l-10 6.4c-.7.5-1.6 0-1.6-.8z"/>';
+    }
+  };
+  const buildEQ = () => {
+    const presetRow = $("presetRow"), bandWrap = $("eqBands");
+    presets.forEach((preset, index) => {
+      const button = document.createElement("button");
+      button.type = "button"; button.className = `preset-btn${index === 0 ? " active" : ""}`;
+      button.textContent = preset.name; button.dataset.preset = preset.name;
+      button.addEventListener("click", () => applyPreset(preset));
+      presetRow.append(button);
+    });
+    bands.forEach((band, index) => {
+      const cell = document.createElement("label"); cell.className = "eq-band";
+      const value = document.createElement("span"); value.className = "eq-val"; value.id = `eqValue${index}`; value.textContent = "0";
+      const input = document.createElement("input"); input.type = "range"; input.className = "eq-range";
+      input.min = "-12"; input.max = "12"; input.step = "1"; input.value = "0";
+      input.setAttribute("aria-label", `${band.hz} Hz 等化器增益`); input.title = `${band.hz} Hz`;
+      input.addEventListener("input", () => {
+        const valueNum = Number(input.value); value.textContent = valueNum > 0 ? `+${valueNum}` : String(valueNum);
+        if (filterNodes[index]) filterNodes[index].gain.value = valueNum;
+        document.querySelectorAll(".preset-btn").forEach(button => button.classList.remove("active"));
+      });
+      const label = document.createElement("span"); label.className = "eq-freq"; label.textContent = band.label;
+      cell.append(value, input, label); bandWrap.append(cell);
+    });
+  };
+  function applyPreset(preset) {
+    preset.values.forEach((value, index) => {
+      const input = $("eqBands").querySelectorAll("input")[index];
+      input.value = String(value);
+      const valueText = $(`eqValue${index}`); valueText.textContent = value > 0 ? `+${value}` : String(value);
+      if (filterNodes[index]) filterNodes[index].gain.value = value;
+    });
+    document.querySelectorAll(".preset-btn").forEach(button => button.classList.toggle("active", button.dataset.preset === preset.name));
+    $("eqState").textContent = `預設：${preset.name}`;
+  }
+  const initAudio = async () => {
+    if (!audioSupported) return false;
+    try {
+      if (!audioContext) {
+        audioContext = new AudioContextClass();
+        sourceNode = audioContext.createMediaElementSource(audio);
+        analyser = audioContext.createAnalyser(); analyser.fftSize = 2048; analyser.smoothingTimeConstant = 0.78;
+        let previous = sourceNode;
+        bands.forEach(band => {
+          const filter = audioContext.createBiquadFilter(); filter.type = "peaking"; filter.frequency.value = band.hz;
+          filter.Q.value = 1.05; filter.gain.value = 0; previous.connect(filter); previous = filter; filterNodes.push(filter);
+        });
+        previous.connect(analyser); analyser.connect(audioContext.destination);
+        $("eqState").textContent = "WEB AUDIO EQ · 就緒";
+      }
+      if (audioContext.state === "suspended") await audioContext.resume();
+      return true;
+    } catch (error) {
+      audioSupported = false;
+      $("eqState").textContent = "原生音訊模式";
+      document.querySelectorAll(".eq-range,.preset-btn").forEach(control => control.disabled = true);
+      announce("瀏覽器無法啟用 Web Audio；將以原生音訊播放，EQ 與頻譜不可用。", true);
+      return false;
+    }
+  };
+  function renderPlaylist() {
+    playlistEl.replaceChildren();
+    if (tracks.length === 0) {
+      const empty = document.createElement("div"); empty.className = "empty-state";
+      empty.innerHTML = '<div class="empty-icon" aria-hidden="true">♫</div><strong>播放清單目前是空的</strong><span>使用「選擇檔案」加入本機 MP3 或 WAV，也可以一次選取多首歌曲。</span>';
+      playlistEl.append(empty);
+    } else {
+      tracks.forEach((track, index) => {
+        const row = document.createElement("div"); row.className = `track-row${track.id === currentId ? " current" : ""}`;
+        row.dataset.id = track.id; row.draggable = true; row.setAttribute("role", "listitem");
+        row.setAttribute("aria-label", `${index + 1}. ${track.name}${track.id === currentId ? "，目前曲目" : ""}`);
+        const number = document.createElement("span"); number.className = "track-number";
+        const handle = document.createElement("span"); handle.className = "drag-handle"; handle.textContent = "⠿"; handle.title = "拖曳排序"; handle.setAttribute("aria-hidden", "true");
+        const numberText = document.createElement("span"); numberText.textContent = String(index + 1).padStart(2, "0"); number.append(handle, numberText);
+        const main = document.createElement("div"); main.className = "track-main";
+        const name = document.createElement("div"); name.className = "track-name"; name.textContent = track.name; name.title = track.name;
+        const details = document.createElement("div"); details.className = "track-state"; details.textContent = track.id === currentId ? (audio.paused ? "已選取" : "正在播放") : "本機音訊";
+        main.append(name, details);
+        const remove = document.createElement("button"); remove.type = "button"; remove.className = "delete-btn"; remove.textContent = "×";
+        remove.title = `移除 ${track.name}`; remove.setAttribute("aria-label", `刪除 ${track.name}`);
+        remove.addEventListener("click", event => { event.stopPropagation(); removeTrack(track.id); });
+        row.append(number, main, remove);
+        row.addEventListener("click", event => { if (!event.target.closest("button") && !event.target.closest(".drag-handle")) playTrack(track.id, true); });
+        row.addEventListener("dragstart", event => {
+          nativeDragId = track.id; row.classList.add("dragging"); event.dataTransfer.effectAllowed = "move";
+          event.dataTransfer.setData("text/plain", track.id);
+        });
+        row.addEventListener("dragend", () => { nativeDragId = null; row.classList.remove("dragging"); playlistEl.querySelectorAll(".drag-over").forEach(el => el.classList.remove("drag-over")); });
+        row.addEventListener("dragover", event => { event.preventDefault(); if (nativeDragId && nativeDragId !== track.id) row.classList.add("drag-over"); });
+        row.addEventListener("dragleave", () => row.classList.remove("drag-over"));
+        row.addEventListener("drop", event => { event.preventDefault(); row.classList.remove("drag-over"); reorderTracks(nativeDragId || event.dataTransfer.getData("text/plain"), track.id); });
+        handle.addEventListener("pointerdown", event => {
+          if (event.pointerType !== "touch") return;
+          event.preventDefault(); touchDragId = track.id; row.classList.add("dragging"); handle.setPointerCapture(event.pointerId);
+        });
+        handle.addEventListener("pointerup", event => {
+          if (event.pointerType !== "touch" || !touchDragId) return;
+          const source = touchDragId, targetRow = document.elementFromPoint(event.clientX, event.clientY)?.closest(".track-row");
+          const target = targetRow?.dataset.id; touchDragId = null;
+          playlistEl.querySelectorAll(".dragging").forEach(el => el.classList.remove("dragging"));
+          if (target) reorderTracks(source, target);
+        });
+        handle.addEventListener("pointercancel", () => { touchDragId = null; row.classList.remove("dragging"); });
+        playlistEl.append(row);
+      });
+    }
+    $("trackCount").textContent = `${tracks.length} 首曲目`;
+  }
+  function reorderTracks(sourceId, targetId) {
+    if (!sourceId || !targetId || sourceId === targetId) return;
+    const from = tracks.findIndex(track => track.id === sourceId), to = tracks.findIndex(track => track.id === targetId);
+    if (from < 0 || to < 0) return;
+    const [item] = tracks.splice(from, 1); tracks.splice(to, 0, item); renderPlaylist();
+  }
+  function setTrackDisplay(track) {
+    if (!track) {
+      trackTitle.textContent = "尚未選擇曲目"; trackSubtitle.textContent = "加入 MP3 或 WAV 開始聆聽";
+      $("duration").textContent = "00:00"; $("elapsed").textContent = "00:00";
+      $("progressRange").value = "0"; $("progressFill").style.width = "0%"; return;
+    }
+    trackTitle.textContent = track.name; trackSubtitle.textContent = `本機檔案 · ${track.file.type || track.extension.toUpperCase()}`;
+    $("duration").textContent = formatTime(audio.duration);
+  }
+  async function playTrack(id, autoplay) {
+    const track = tracks.find(item => item.id === id); if (!track) return;
+    currentId = id;
+    if (audio.src !== track.url) {
+      audio.pause(); audio.src = track.url; audio.load();
+    }
+    setTrackDisplay(track); renderPlaylist();
+    if (autoplay) {
+      await initAudio();
+      try { await audio.play(); setPlayButton(true); announce(audioSupported ? `正在播放：${track.name}` : `原生模式播放：${track.name}`, !audioSupported); }
+      catch (error) { setPlayButton(false); announce("無法播放此音訊檔案；請確認檔案格式或瀏覽器支援。", true); }
+    } else {
+      setPlayButton(false); announce(`已選取：${track.name}`);
+    }
+  }
+  async function togglePlayback() {
+    if (!tracks.length) { announce("請先加入 MP3 或 WAV 音訊檔案。", true); return; }
+    if (!currentId) { await playTrack(tracks[0].id, true); return; }
+    if (audio.paused) {
+      await initAudio();
+      try { await audio.play(); setPlayButton(true); announce(`正在播放：${getCurrent()?.name || "音訊"}`, !audioSupported); }
+      catch (error) { setPlayButton(false); announce("播放失敗；請確認瀏覽器可解碼此音訊檔案。", true); }
+    } else { audio.pause(); setPlayButton(false); announce(`已暫停：${getCurrent()?.name || "音訊"}`); renderPlaylist(); }
+  }
+  function stopPlayback() {
+    audio.pause(); if (audio.src) audio.currentTime = 0;
+    setPlayButton(false); $("elapsed").textContent = "00:00"; $("progressRange").value = "0"; $("progressFill").style.width = "0%";
+    announce(currentId ? `已停止：${getCurrent()?.name || "音訊"}` : "播放已停止"); renderPlaylist();
+  }
+  function stepTrack(direction) {
+    if (!tracks.length) { announce("播放清單尚無曲目。", true); return; }
+    let index = tracks.findIndex(track => track.id === currentId);
+    if (index < 0) index = direction > 0 ? -1 : 0;
+    const next = index + direction;
+    if (next < 0 || next >= tracks.length) {
+      if (direction > 0) { stopPlayback(); announce("已到播放清單最後一首，播放停止。"); }
+      else if (tracks.length) playTrack(tracks[0].id, true);
+      return;
+    }
+    playTrack(tracks[next].id, true);
+  }
+  function removeTrack(id) {
+    const index = tracks.findIndex(track => track.id === id); if (index < 0) return;
+    const [removed] = tracks.splice(index, 1); const wasCurrent = id === currentId;
+    URL.revokeObjectURL(removed.url);
+    if (wasCurrent) {
+      audio.pause(); audio.removeAttribute("src"); audio.load(); currentId = null; setPlayButton(false);
+      if (tracks.length) { const next = tracks[Math.min(index, tracks.length - 1)]; playTrack(next.id, false); }
+      else setTrackDisplay(null);
+    }
+    renderPlaylist(); announce(`已移除：${removed.name}`);
+  }
+  function clearPlaylist() {
+    if (!tracks.length) { announce("播放清單已經是空的。", true); return; }
+    audio.pause(); audio.removeAttribute("src"); audio.load();
+    tracks.forEach(track => URL.revokeObjectURL(track.url)); tracks.length = 0; currentId = null;
+    setTrackDisplay(null); setPlayButton(false); renderPlaylist(); announce("播放清單已全部清除。");
+  }
+  function addFiles(fileList) {
+    const files = Array.from(fileList || []);
+    const accepted = files.filter(file => /\.(mp3|wav)$/i.test(file.name) || /^(audio\/(mpeg|mp3|wav|x-wav))$/i.test(file.type));
+    if (files.length && accepted.length === 0) { announce("未加入檔案：僅支援 MP3 與 WAV 格式。", true); return; }
+    accepted.forEach(file => {
+      const extension = file.name.split(".").pop() || "audio";
+      tracks.push({ id: `track-${++objectSequence}`, file, name: file.name.replace(/\.[^.]+$/, "") || file.name, extension, url: URL.createObjectURL(file) });
+    });
+    if (accepted.length < files.length) announce(`已加入 ${accepted.length} 首；已略過 ${files.length - accepted.length} 個非 MP3/WAV 檔案。`, true);
+    else if (accepted.length) announce(`已加入 ${accepted.length} 首音訊至播放清單。`);
+    if (!currentId && tracks.length) playTrack(tracks[0].id, false);
+    renderPlaylist();
+  }
+
+  $("addBtn").addEventListener("click", () => fileInput.click());
+  fileInput.addEventListener("change", () => { addFiles(fileInput.files); fileInput.value = ""; });
+  $("clearBtn").addEventListener("click", clearPlaylist);
+  $("playBtn").addEventListener("click", togglePlayback);
+  $("stopBtn").addEventListener("click", stopPlayback);
+  $("prevBtn").addEventListener("click", () => stepTrack(-1));
+  $("nextBtn").addEventListener("click", () => stepTrack(1));
+  audio.addEventListener("timeupdate", () => {
+    $("elapsed").textContent = formatTime(audio.currentTime);
+    if (!isSeeking && Number.isFinite(audio.duration) && audio.duration > 0) {
+      const ratio = audio.currentTime / audio.duration; $("progressRange").value = String(Math.round(ratio * 1000)); $("progressFill").style.width = `${ratio * 100}%`;
+    }
+  });
+  audio.addEventListener("loadedmetadata", () => { $("duration").textContent = formatTime(audio.duration); });
+  audio.addEventListener("play", () => { setPlayButton(true); renderPlaylist(); });
+  audio.addEventListener("pause", () => { setPlayButton(false); renderPlaylist(); });
+  audio.addEventListener("ended", () => {
+    const index = tracks.findIndex(track => track.id === currentId);
+    if (index >= 0 && index < tracks.length - 1) playTrack(tracks[index + 1].id, true);
+    else { setPlayButton(false); audio.currentTime = 0; $("elapsed").textContent = "00:00"; $("progressRange").value = "0"; $("progressFill").style.width = "0%"; announce("最後一首播放完畢，已停止。"); renderPlaylist(); }
+  });
+  audio.addEventListener("error", () => { if (currentId && audio.error) announce("無法讀取此音訊；檔案可能損毀或格式不受支援。", true); });
+  $("progressRange").addEventListener("input", event => {
+    isSeeking = true; const ratio = Number(event.target.value) / 1000; $("progressFill").style.width = `${ratio * 100}%`;
+    if (Number.isFinite(audio.duration)) $("elapsed").textContent = formatTime(ratio * audio.duration);
+  });
+  $("progressRange").addEventListener("change", event => {
+    if (Number.isFinite(audio.duration)) audio.currentTime = (Number(event.target.value) / 1000) * audio.duration;
+    isSeeking = false;
+  });
+  let volumePointerX = null, volumeStart = 0;
+  volumeKnob.addEventListener("pointerdown", event => {
+    volumePointerX = event.clientX; volumeStart = volume; volumeKnob.setPointerCapture(event.pointerId); event.preventDefault();
+  });
+  volumeKnob.addEventListener("pointermove", event => {
+    if (volumePointerX === null) return;
+    setVolume(volumeStart - (event.clientX - volumePointerX) / 180);
+  });
+  const endVolumeDrag = () => { volumePointerX = null; };
+  volumeKnob.addEventListener("pointerup", endVolumeDrag); volumeKnob.addEventListener("pointercancel", endVolumeDrag);
+  volumeKnob.addEventListener("keydown", event => {
+    if (["ArrowLeft", "ArrowDown"].includes(event.key)) { event.preventDefault(); setVolume(volume - .03); }
+    if (["ArrowRight", "ArrowUp"].includes(event.key)) { event.preventDefault(); setVolume(volume + .03); }
+    if (event.key === "Home") { event.preventDefault(); setVolume(0); }
+    if (event.key === "End") { event.preventDefault(); setVolume(1); }
+  });
+
+  const canvas = $("visualizer"), ctx = canvas.getContext("2d");
+  let frame = 0;
+  function drawSpectrum() {
+    frame = requestAnimationFrame(drawSpectrum);
+    const rect = canvas.getBoundingClientRect(); if (!rect.width || !rect.height) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    if (canvas.width !== Math.round(rect.width * dpr) || canvas.height !== Math.round(rect.height * dpr)) {
+      canvas.width = Math.round(rect.width * dpr); canvas.height = Math.round(rect.height * dpr);
+    }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, rect.width, rect.height);
+    const width = rect.width, height = rect.height, count = 128, gap = Math.max(.7, width / 750), barWidth = width / count;
+    let data = null;
+    if (analyser && audioContext && audioContext.state === "running") { data = new Uint8Array(analyser.frequencyBinCount); analyser.getByteFrequencyData(data); }
+    const gradient = ctx.createLinearGradient(0, height, 0, 0);
+    gradient.addColorStop(0, "#2563eb"); gradient.addColorStop(.26, "#06b6d4"); gradient.addColorStop(.48, "#22c55e"); gradient.addColorStop(.67, "#eab308"); gradient.addColorStop(.84, "#f97316"); gradient.addColorStop(1, "#ef4444");
+    for (let i = 0; i < count; i++) {
+      let magnitude = 0;
+      if (data) {
+        const position = Math.pow((i + .5) / count, 2.25) * (data.length - 1);
+        const center = Math.floor(position), radius = Math.max(1, Math.round((i / count) * 5));
+        let sum = 0, samples = 0;
+        for (let k = Math.max(0, center - radius); k <= Math.min(data.length - 1, center + radius); k++) { sum += data[k]; samples++; }
+        magnitude = samples ? sum / samples / 255 : 0;
+      } else {
+        magnitude = audio.paused ? .018 + Math.abs(Math.sin(frame * .017 + i * .25)) * .018 : .04 + Math.abs(Math.sin(frame * .08 + i * .31)) * .08;
+      }
+      const floor = audio.paused ? .012 : .025;
+      const barHeight = Math.max(2, Math.min(height * .92, magnitude * height * 1.18 + floor * height));
+      const x = i * barWidth + gap / 2;
+      ctx.globalAlpha = data ? .92 : .42; ctx.fillStyle = gradient;
+      ctx.shadowBlur = data && magnitude > .18 ? 5 : 0; ctx.shadowColor = "#22d3ee66";
+      ctx.fillRect(x, height - barHeight, Math.max(.5, barWidth - gap), barHeight);
+      ctx.shadowBlur = 0;
+    }
+    ctx.globalAlpha = 1;
+  }
+  buildEQ(); applyPreset(presets[0]); setVolume(volume); renderPlaylist(); drawSpectrum();
+  if (!audioSupported) { $("eqState").textContent = "瀏覽器不支援 Web Audio"; document.querySelectorAll(".eq-range,.preset-btn").forEach(control => control.disabled = true); announce("瀏覽器不支援 Web Audio API；本機原生播放可用，但 EQ 與頻譜分析停用。", true); }
+})();
+</script>
+</body>
+</html>
